@@ -32,7 +32,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Setup Install4J
+      - name: Build with Maven
+        run: mvn -B package -DskipTests
+      - name: Build Installers
         env:
           INSTALL4J_LICENSE_KEY: ${{secrets.INSTALL4J_LICENSE_KEY }}
         run: |
@@ -42,8 +44,7 @@ jobs:
           wget https://s3-us-west-2.amazonaws.com/openpnp/macosx-amd64-1.8.0_131.tar.gz
           wget https://s3-us-west-2.amazonaws.com/openpnp/windows-amd64-1.8.0_131.tar.gz
           wget https://s3-us-west-2.amazonaws.com/openpnp/windows-x86-1.8.0_131.tar.gz
-      - name: Build with Maven
-        run: mvn -B package -DskipTests
+          VERSION=`java -jar target/openpnp-gui-0.0.1-alpha-SNAPSHOT.jar --version`
+          TRAVIS_BRANCH=temptest
+          ./install4j8.0.6/bin/install4jc -r $VERSION -d installers -D mediaFileVersion=$TRAVIS_BRANCH OpenPnP.install4j
 
-          
-        
