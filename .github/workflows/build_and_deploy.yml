@@ -33,7 +33,7 @@ jobs:
         with:
           java-version: 8
       - name: Build with Maven
-        run: mvn -B package
+        run: mvn -B package -DskipTests
       - name: Setup Install4J
         env:
           INSTALL4J_LICENSE_KEY: ${{secrets.INSTALL4J_LICENSE_KEY }}
