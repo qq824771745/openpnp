@@ -24,7 +24,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
-    needs: build
+    needs: test
     if: github.ref == 'refs/heads/github-actions'
     steps:
       - uses: actions/checkout@v2
