@@ -27,13 +27,17 @@ jobs:
     # needs: test
     # if: github.ref == 'refs/heads/github-actions'
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
       - name: Setup JDK 8 for Deployment
         uses: actions/setup-java@v1
         with:
           java-version: 8
+
       - name: Build with Maven
         run: mvn -B package -DskipTests
+
       - name: Build Installers
         env:
           INSTALL4J_LICENSE_KEY: ${{secrets.INSTALL4J_LICENSE_KEY }}
@@ -47,4 +51,15 @@ jobs:
           VERSION=`java -jar target/openpnp-gui-0.0.1-alpha-SNAPSHOT.jar --version`
           TRAVIS_BRANCH=temptest
           ./install4j8.0.6/bin/install4jc -r $VERSION -d installers -D mediaFileVersion=$TRAVIS_BRANCH OpenPnP.install4j
-
+          mv installers/updates.xml installers/updates-$TRAVIS_BRANCH.xml
+          mkdir -p installers/$TRAVIS_BRANCH/$VERSION
+          cp installers/OpenPnP* installers/$TRAVIS_BRANCH/$VERSION
+          
+      - name: Upload Installers to S3
+        uses: shallwefootball/upload-s3-action@v1.1.3
+        with:
+          aws_key_id: ${{ secrets.S3_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          aws_bucket: openpnp
+          source_dir: 'installers'
+          destination_dir: ''        
