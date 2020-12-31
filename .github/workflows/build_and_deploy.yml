@@ -32,18 +32,18 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Build with Maven
-        run: mvn -B package -DskipTests
       - name: Setup Install4J
         env:
           INSTALL4J_LICENSE_KEY: ${{secrets.INSTALL4J_LICENSE_KEY }}
-        run: 
+        run: |
           wget https://openpnp.s3-us-west-2.amazonaws.com/install4j_unix_8_0_6.tar.gz
           tar -xzf install4j_unix_8_0_6.tar.gz
           ./install4j8.0.6/bin/install4jc -L $INSTALL4J_LICENSE_KEY
           wget https://s3-us-west-2.amazonaws.com/openpnp/macosx-amd64-1.8.0_131.tar.gz
           wget https://s3-us-west-2.amazonaws.com/openpnp/windows-amd64-1.8.0_131.tar.gz
           wget https://s3-us-west-2.amazonaws.com/openpnp/windows-x86-1.8.0_131.tar.gz
+      - name: Build with Maven
+        run: mvn -B package -DskipTests
 
           
         
