@@ -1,0 +1,49 @@
+name: Build and Deploy OpenPnP
+
+on: 
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Java ${{ matrix.java }}
+    strategy:
+      matrix:
+        java: [8, 9, 10, 11, 12, 13, 14, 15]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build with Maven
+        run: mvn -B test
+        
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    needs: build
+    if: github.ref == 'refs/heads/github-actions'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8 for Deployment
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Build with Maven
+        run: mvn -B package
+      - name: Setup Install4J
+        - env:
+          INSTALL4J_LICENSE_KEY: ${{secrets.INSTALL4J_LICENSE_KEY }}
+        - run: 
+          wget https://openpnp.s3-us-west-2.amazonaws.com/install4j_unix_8_0_6.tar.gz
+          tar -xzf install4j_unix_8_0_6.tar.gz
+          ./install4j8.0.6/bin/install4jc -L $INSTALL4J_LICENSE_KEY
+          wget https://s3-us-west-2.amazonaws.com/openpnp/macosx-amd64-1.8.0_131.tar.gz
+          wget https://s3-us-west-2.amazonaws.com/openpnp/windows-amd64-1.8.0_131.tar.gz
+          wget https://s3-us-west-2.amazonaws.com/openpnp/windows-x86-1.8.0_131.tar.gz
+
+          
+        
